@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.FuwuxinxiDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.fuwuxinxi_name as fuwuxinxiName
+        ,a.fuwuxinxi_types as fuwuxinxiTypes
+        ,a.fuwuxinxi_photo as fuwuxinxiPhoto
+        ,a.fuwuxinxi_time as fuwuxinxiTime
+        ,a.fuwuxinxi_address as fuwuxinxiAddress
+        ,a.fuwuxinxi_content as fuwuxinxiContent
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.FuwuxinxiView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+
+        FROM fuwuxinxi  a
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test=" params.fuwuxinxiName != '' and params.fuwuxinxiName != null and params.fuwuxinxiName != 'null' ">
+                and a.fuwuxinxi_name like CONCAT('%',#{params.fuwuxinxiName},'%')
+            </if>
+            <if test="params.fuwuxinxiTypes != null and params.fuwuxinxiTypes != ''">
+                and a.fuwuxinxi_types = #{params.fuwuxinxiTypes}
+            </if>
+            <if test=" params.fuwuxinxiTimeStart != '' and params.fuwuxinxiTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.fuwuxinxi_time) >= UNIX_TIMESTAMP(#{params.fuwuxinxiTimeStart}) ]]>
+            </if>
+            <if test=" params.fuwuxinxiTimeEnd != '' and params.fuwuxinxiTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.fuwuxinxi_time) <= UNIX_TIMESTAMP(#{params.fuwuxinxiTimeEnd}) ]]>
+            </if>
+            <if test=" params.fuwuxinxiAddress != '' and params.fuwuxinxiAddress != null and params.fuwuxinxiAddress != 'null' ">
+                and a.fuwuxinxi_address like CONCAT('%',#{params.fuwuxinxiAddress},'%')
+            </if>
+            <if test=" params.fuwuxinxiContent != '' and params.fuwuxinxiContent != null and params.fuwuxinxiContent != 'null' ">
+                and a.fuwuxinxi_content like CONCAT('%',#{params.fuwuxinxiContent},'%')
+            </if>
+
+        </where>
+
+        order by a.${params.orderBy} desc 
+    </select>
+
+</mapper>
